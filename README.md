@@ -18,7 +18,6 @@ A RESTful API built with Node.js and Express.js for the Decode Labs Week 1 asses
    git clone [https://github.com/Muqulll/task-1-AbdulMuqeet.git](https://github.com/Muqulll/task-1-AbdulMuqeet.git)
    cd task-1-AbdulMuqeet
 
-```
 
 2. **Install dependencies:**
 ```bash
