@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Decode Labs - Product Catalog</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body class="bg-violet-900 text-slate-100 min-h-screen font-sans">
+    <div class="max-w-6xl mx-auto px-6 py-12">
+      <!-- Header -->
+      <header
+        class="mb-10 border-b border-slate-800 pb-6 flex justify-between items-center"
+      >
+        <div>
+          <h1 class="text-3xl font-bold tracking-tight text-white">
+            Product Catalog
+          </h1>
+          <p class="text-slate-400 text-sm mt-1">
+            Decode Labs Engineering Showcase
+          </p>
+        </div>
+        <span
+          class="px-3 py-1 bg-emerald-500/50 text-emerald-400 border border-emarald-500 text-xs rounded-full font-mono"
+          >API Active</span
+        >
+      </header>
+
+      <div class="grid grid-cols-1 lg:grid-cols-5 gap-8">
+        <!-- Form Section -->
+        <section
+          class="lg:col-span-2 bg-slate-800/50 rounded-xl border border-slate-800 p-6 h-fit"
+        >
+          <h2 class="text-lg font-semibold text-white mb-4">
+            Add New Products
+          </h2>
+          <form id="productForm" class="space-y-4">
+            <div>
+              <label
+                class="block text-xs font-medium text-slate-400 uppercase tracking-wider mb-1"
+                >Product Name</label
+              >
+              <input
+                type="text"
+                id="name"
+                required
+                class="w-full bg-slate-900 border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500"
+                placeholder="e.g. Gaming Headset"
+              />
+            </div>
+            <div>
+              <label
+                class="block text-xs font-medium text-slate-400 uppercase tracking-wider mb-1"
+              >
+                Description (Markdown Supported)
+              </label>
+              <textarea
+                id="description"
+                required
+                rows="4"
+                class="w-full bg-slate-900 border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500 font-mono"
+                placeholder="**Bold feature**, *italic text*, or - bullet points..."
+              ></textarea>
+            </div>
+
+            <div>
+              <label
+                class="block text-xs font-medium text-slate-400 uppercase tracking-wider mb-1"
+                >Price ($)</label
+              >
+              <input
+                type="number"
+                id="price"
+                required
+                min="1"
+                class="w-full bg-slate-900 border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500"
+                placeholder="e.g. 49"
+              />
+            </div>
+            <button
+              type="submit"
+              class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-medium py-2 px-4 rounded-lg text-sm transition-colors duration-150"
+            >
+              Submit Product
+            </button>
+            <p id="statusMsg" class="text-xs text-center hidden"></p>
+          </form>
+        </section>
+
+        <!-- List Section -->
+        <section class="lg:col-span-3">
+          <h2 class="text-lg font-semibold text-white mb-4">Inventory</h2>
+          <div
+            id="productList"
+            class="grid grid-cols-1 sm:grid-cols-1 sm:grid-cols-2 gap-4"
+          >
+            <!-- Dynamically populated -->
+          </div>
+        </section>
+      </div>
+    </div>
+
+    <script>
+      const productList = document.getElementById("productList");
+      const productForm = document.getElementById("productForm");
+      const statusMsg = document.getElementById("statusMsg");
+
+      // Get /products
+      async function fetchProducts() {
+        try {
+          const res = await fetch("/products");
+          const data = await res.json();
+
+          productList.innerHTML = "";
+
+          data.forEach((item) => {
+            const card = document.createElement("div");
+            card.className =
+              "bg-slate-800/50 p-5 rounded-xl border border-slate-700 flex flex-col justify-between hover:border-slate-600 transition-all cursor-pointer";
+            card.innerHTML = `
+    <div>
+      <span class="text-xs text-slate-500 font-mono">ID:#${item.id}</span>
+      <h3 class="font-medium text-white mt-1">${item.name}</h3>
+    </div>
+    <p class="text-xs text-slate-300/70 line-clamp-3 leading-relaxed mt-2">${item.description}</p>
+    <div class="mt-4 pt-3 border-t border-slate-700/50 flex justify-between items-center">
+      <span class="text-lg font-bold text-emerald-400">$${item.price}</span>
+      <!-- Direct link to detail page -->
+      <a href="/product.html?id=${item.id}" class="text-xs bg-indigo-600/30 text-indigo-300 hover:bg-indigo-600 hover:text-white px-3 py-1.5 rounded-lg border border-indigo-500/30 transition-all">
+        View Details →
+      </a>
+    </div>
+  `;
+            productList.appendChild(card);
+          });
+        } catch (err) {
+          productList.innerHTML =
+            '<p class = "text-red-400 text-sm">Failed to load products.</p>';
+        }
+      }
+
+      // POST /products
+      productForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const name = document.getElementById("name").value;
+        const price = document.getElementById("price").value;
+        const description = document.getElementById("description").value;
+        try {
+          const res = await fetch("/products", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ name, price, description }),
+          });
+
+          const data = await res.json();
+
+          if (res.ok) {
+            statusMsg.textContent = "Product added Successfully!";
+            statusMsg.className = "text-xs text-center text-emerald-400 block";
+            productForm.reset();
+            fetchProducts();
+          } else {
+            statusMsg.textContent = "Error adding products";
+            statusMsg.className = "text-xs text-center text-red-400 block";
+          }
+        } catch (err) {
+          statusMsg.textContent = "Network error";
+          statusMsg.className = "text-xs text-center text-red-400 block";
+        }
+        setTimeout(
+          () => (statusMsg.className = "text-xs text-center hidden"),
+          3000,
+        );
+      });
+
+      fetchProducts();
+    </script>
+  </body>
+</html>
