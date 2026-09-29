@@ -1,6 +1,7 @@
 # Decode Labs — Week 1 Task (Express.js Product API)
 
-**Developer:** Abdul Muqeet
+**Developer:** Abdul Muqeet  
+**Respository** DecodLabs-Internship  
 **Track:** Backend Development  
 
 ## Overview
