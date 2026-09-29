@@ -16,9 +16,8 @@ A RESTful API built with Node.js and Express.js for the Decode Labs Week 1 asses
 
 1. **Clone the repository:**
    ```bash
-   git clone [https://github.com/Muqulll/task-1-AbdulMuqeet.git](https://github.com/Muqulll/task-1-AbdulMuqeet.git)
-   cd task-1-AbdulMuqeet
-
+   git clone https://github.com/Muqulll/DecodeLabs-Internship.git
+   cd DecodeLabs-Internship
 
 2. **Install dependencies:**
 ```bash
